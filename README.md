@@ -56,8 +56,9 @@ The data preparation process involves several steps to handle the labeled flag p
 
 **Results**: 
 - For baseline I used my older LSTM experiments, with around 30-35% 6-way classification accuracy
-- Multi-class accuracy: ~55% (6-way classification)
-- Binary accuracy (Bullish vs Bearish): ~76%
+- For transformer:
+- Multi-class accuracy: ~57% (6-way classification)
+- Binary accuracy (Bullish vs Bearish): ~78%
 - Training time: ~3 minutes on NVIDIA RTX 5070 (Blackwell) for 2000 epochs
 - The model performs better at distinguishing bullish vs bearish patterns than at classifying specific flag sub-types
 
@@ -71,37 +72,38 @@ This project is containerized using Docker. Follow the instructions below to bui
 Run the following command in the root directory of the repository to build the Docker image:
 
 ```bash
-docker build -t deeplearning .
+docker build -t my-dl-project-work-app:1.0 .
 ```
 
 #### Run
 
-To run the solution, use the following command. The current directory is mounted to `/app` inside the container, which allows access to data and preserves generated outputs (logs, plots, models).
+To run the solution, you need to mount two directories:
+- **Data directory**: Mount your data folder to `/data` inside the container
+- **Output directory**: Mount an output folder to `/app/output` inside the container
 
-**Windows (PowerShell):**
+**Linux/macOS:**
 ```bash
-docker run --gpus all -p 8888:8888 -v "${PWD}:/app" -it deeplearning bash -c "python main.py"
+docker run --rm --gpus all \
+ -v /teljes/eleresi/ut/az/adatokhoz:/data \
+ -v /teljes/eleresi/ut/az/outputhoz:/app/output \
+ my-dl-project-work-app:1.0 > training_log.txt 2>&1
 ```
 
-**Windows (CMD):**
+**Windows (Command Prompt/PowerShell):**
 ```bash
-docker run --gpus all -p 8888:8888 -v "%cd%:/app" -it deeplearning bash -c "python main.py"
+docker run --rm --gpus all ^
+ -v C:\eleresi\ut\az\adatokhoz:/data ^
+ -v C:\eleresi\ut\az\outputhoz:/app/output ^
+ my-dl-project-work-app:1.0 > training_log.txt 2>&1
 ```
 
-**Linux/Mac:**
-```bash
-docker run --gpus all -p 8888:8888 -v "$(pwd):/app" -it deeplearning bash -c "python main.py"
-```
-
-**To capture logs for submission (output is automatically logged to `log/run.log`):**
-
-The logging system (`src/utils.py`) automatically writes all output to both:
-- `log/run.log` file (in the mounted directory)
-- stdout (visible in console)
-
-After running, the log file will be available in your local `log/` directory.
-
-**Note**: If you don't have GPU support, remove the `--gpus all` flag.
+**Important notes:**
+- Replace `/teljes/eleresi/ut/az/adatokhoz` (Linux/macOS) or `C:\eleresi\ut\az\adatokhoz` (Windows) with the actual path to your data directory containing the labeled datasets
+- Replace `/teljes/eleresi/ut/az/outputhoz` (Linux/macOS) or `C:\eleresi\ut\az\outputhoz` (Windows) with the actual path where you want the output files (models and plots)
+- The `> training_log.txt 2>&1` redirects all output (stdout and stderr) to `training_log.txt` file
+- After execution, all training logs will be in `training_log.txt`, and generated files (models, plots) will be in your output directory
+- If you don't have GPU support, remove the `--gpus all` flag
+- The `--rm` flag automatically removes the container after it finishes
 
 
 ### File Structure and Functions
@@ -138,44 +140,46 @@ The repository is structured as follows:
         - `load_model()`: Loads trained model from checkpoint
         - `main()`: Runs inference on test set using saved model and split information
     - **`utils.py`**: Utility functions
-        - `setup_logger()`: Configures logging to both file and stdout (for Docker)
+        - `setup_logger()`: Configures logging to stdout (captured by Docker redirect to training_log.txt)
         - `get_logger()`: Retrieves or creates logger instance
-
-- **`main.py`**: Main entry point that orchestrates the entire pipeline:
-    1. Sets up logging
-    2. Loads and preprocesses data
-    3. Creates datasets and data loaders
-    4. Initializes model
-    5. Trains model
-    6. Evaluates on test set
-    7. Saves model and generates plots
-
-- **`run.sh`**: Shell script wrapper to execute the training pipeline
+    - **`main.py`**: Main entry point that orchestrates the entire pipeline:
+            1. Sets up logging
+            2. Loads and preprocesses data
+            3. Creates datasets and data loaders
+            4. Initializes model
+            5. Trains model
+            6. Evaluates on test set
+            7. Saves model and generates plots
+    - **`run.sh`**: Shell script wrapper to execute the training pipeline
 
 - **`notebook/`**: Contains Jupyter notebooks for development and experimentation
     - `transformer.ipynb`: Original development notebook (kept for reference)
     - `lstm.ipynb`: LSTM experimentation notebook
     - `data_gather/`: Data collection notebook
 
-- **`log/`**: Generated log files (created during execution)
-    - `run.log`: Comprehensive log file containing all training information (hyperparameters, data processing, model architecture, training metrics, validation metrics, final evaluation results)
-
-- **`plots/`**: Generated plot files (created during execution)
-    - `training_history.png`: Loss and accuracy curves over epochs
-    - `confusion_matrix_train.png`: Training set confusion matrix
-    - `confusion_matrix_test.png`: Test set confusion matrix
-    - `binary_confusion_matrix_test.png`: Binary (Bullish vs Bearish) confusion matrix
-
-- **`models/`**: Saved model files (created during training)
-    - `best_model.pth`: Trained model checkpoint with architecture config and weights
-    - `split_info.pkl`: Train/test split information for reproducible inference
-
-- **`flags/bullflagdetector/`**: Data directory containing labeled datasets from multiple annotators
-    - Each student folder contains CSV files (time series data) and JSON files (label annotations)
-
 - **Root Directory**:
     - `Dockerfile`: Configuration for building Docker image with PyTorch and CUDA support
+    - `.dockerignore`: I have stored the data folder locally, this is just so I don't copy that
     - `requirements.txt`: Python dependencies (pandas, numpy, torch, scikit-learn, matplotlib, seaborn, etc.)
     - `README.md`: Project documentation
     - `LICENSE`: License file
+
+
+I used these locally, but will be mounted when executing:
+- **`output/`**: Output directory for generated files (created during execution)
+    - **`plots/`**: Generated plot files
+        - `training_history.png`: Loss and accuracy curves over epochs
+        - `confusion_matrix_train.png`: Training set confusion matrix
+        - `confusion_matrix_test.png`: Test set confusion matrix
+        - `binary_confusion_matrix_test.png`: Binary (Bullish vs Bearish) confusion matrix
+    - **`models/`**: Saved model files
+        - `best_model.pth`: Trained model checkpoint with architecture config and weights
+        - `split_info.pkl`: Train/test split information for reproducible inference
+
+- **`data/`**: Data directory containing labeled datasets from multiple annotators
+    - Each student folder contains CSV files (time series data) and JSON files (label annotations)
+    - This folder should be mounted to `/data` when running in Docker
     
+- **`training_log.txt`**: Generated log file (created when using Docker redirect)
+    - Contains all training information captured from stdout/stderr (hyperparameters, data processing, model architecture, training metrics, validation metrics, final evaluation results)
+    - Created automatically when using `> training_log.txt 2>&1` in the Docker run command

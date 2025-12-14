@@ -7,13 +7,13 @@ import pickle
 import torch
 from torch.utils.data import DataLoader
 
-from src.utils import setup_logger, get_logger
-from src.config import Config
-from src.data_loader import load_all_labels, build_timeseries_df_local, remove_outliers
-from src.dataset import TimeSeriesDataset, collate_fn
-from src.model import TimeSeriesTransformer
-from src.train import split_data
-from src.evaluate import (
+from utils import setup_logger, get_logger
+from config import Config
+from data_loader import load_all_labels, build_timeseries_df_local, remove_outliers
+from dataset import TimeSeriesDataset, collate_fn
+from model import TimeSeriesTransformer
+from train import split_data
+from evaluate import (
     evaluate_model, 
     plot_confusion_matrix, 
     plot_binary_confusion_matrix,
@@ -54,15 +54,15 @@ def load_model(model_path, device):
 
 def main():
     """Run inference on test set."""
-    # Use the same log file as training
-    logger = setup_logger(name='inference', log_file='log/run.log')
+    # Set up logging (outputs to stdout, which will be captured to training_log.txt via Docker redirect)
+    logger = setup_logger(name='inference', log_file=None)
     
     logger.info("=" * 60)
     logger.info("Running Inference on Test Set")
     logger.info("=" * 60)
     
-    model_path = os.path.join('models', 'best_model.pth')
-    split_info_path = os.path.join('models', 'split_info.pkl')
+    model_path = os.path.join('output/models', 'best_model.pth')
+    split_info_path = os.path.join('output/models', 'split_info.pkl')
     
     if not os.path.exists(model_path):
         logger.error(f"Model not found at {model_path}. Please train the model first using main.py")
@@ -175,7 +175,7 @@ def main():
         test_preds,
         train_dataset.get_label_encoder().classes_,
         title='Confusion Matrix - Test Set',
-        save_path='plots/confusion_matrix_test_inference.png'
+        save_path='output/plots/confusion_matrix_test_inference.png'
     )
     logger.info(f"Confusion matrix saved to {conf_path}")
     
@@ -183,9 +183,9 @@ def main():
         test_labels,
         test_preds,
         train_dataset.get_label_encoder(),
-        save_path='plots/binary_confusion_matrix_inference.png'
+        save_path='output/plots/binary_confusion_matrix_inference.png'
     )
-    logger.info(f"Binary confusion matrix saved to plots/binary_confusion_matrix_inference.png")
+    logger.info(f"Binary confusion matrix saved to output/plots/binary_confusion_matrix_inference.png")
     
     logger.info("\nInference completed successfully!")
 

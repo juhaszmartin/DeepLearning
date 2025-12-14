@@ -156,3 +156,4 @@ def print_model_summary(model):
     print(f"Total Trainable Params: {total_params:,}")
     print("-" * 60)
 
+

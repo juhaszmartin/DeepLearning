@@ -7,7 +7,7 @@ class Config:
     """Central configuration for model hyperparameters."""
     
     # Data paths
-    ROOT_DIR = "./flags/bullflagdetector"
+    ROOT_DIR = "/data"
     
     # Data preprocessing
     MAX_SEGMENT_LEN = 100  # Maximum segment length for outlier removal
@@ -49,4 +49,5 @@ class Config:
             'MAX_LEN_POS_ENCODING': cls.MAX_LEN_POS_ENCODING,
             'DEVICE': str(cls.DEVICE),
         }
+
 

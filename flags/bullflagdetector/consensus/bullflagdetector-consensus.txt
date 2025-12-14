@@ -1,2 +1,0 @@
-bullflagdetector\AS76HW\XAU_30m_data_limited.csv
-bullflagdetector\DO1H50\EURUSD_1minute_004.csv

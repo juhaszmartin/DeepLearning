@@ -1,0 +1,6 @@
+data/
+output/
+training_log.txt
+.git
+.ipynb_checkpoints
+__pycache__

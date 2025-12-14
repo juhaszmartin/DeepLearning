@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
 
-from src.utils import get_logger
+from utils import get_logger
 
 
 def train_epoch(model, train_loader, criterion, optimizer, device):

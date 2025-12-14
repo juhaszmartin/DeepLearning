@@ -52,12 +52,12 @@ def plot_confusion_matrix(all_labels, all_preds, class_names, title='Confusion M
         save_path: Path to save the plot (if None, auto-generates from title)
     """
     # Ensure plots directory exists
-    os.makedirs('plots', exist_ok=True)
+    os.makedirs('output/plots', exist_ok=True)
     
     # Generate filename from title if not provided
     if save_path is None:
         filename = title.lower().replace(' ', '_').replace('-', '_') + '.png'
-        save_path = os.path.join('plots', filename)
+        save_path = os.path.join('output/plots', filename)
     
     cm = confusion_matrix(all_labels, all_preds)
     
@@ -91,11 +91,11 @@ def plot_binary_confusion_matrix(all_labels, all_preds, label_encoder, save_path
         binary_acc: Binary accuracy score
     """
     # Ensure plots directory exists
-    os.makedirs('plots', exist_ok=True)
+    os.makedirs('output/plots', exist_ok=True)
     
     # Generate filename if not provided
     if save_path is None:
-        save_path = os.path.join('plots', 'binary_confusion_matrix_test.png')
+        save_path = os.path.join('output/plots', 'binary_confusion_matrix_test.png')
     
     # Map specific indices back to high-level categories (Bullish/Bearish)
     idx_to_class = {i: name for i, name in enumerate(label_encoder.classes_)}
@@ -148,11 +148,11 @@ def plot_training_history(history, save_path=None):
         save_path: Path where plot was saved
     """
     # Ensure plots directory exists
-    os.makedirs('plots', exist_ok=True)
+    os.makedirs('output/plots', exist_ok=True)
     
     # Generate filename if not provided
     if save_path is None:
-        save_path = os.path.join('plots', 'training_history.png')
+        save_path = os.path.join('output/plots', 'training_history.png')
     
     epochs_range = range(1, len(history['train_loss']) + 1)
     
@@ -226,7 +226,7 @@ def plot_train_test_confusion_matrices(model, train_loader, test_loader, device,
         train_preds,
         class_names,
         title='Confusion Matrix - Training Set',
-        save_path='plots/confusion_matrix_train.png'
+        save_path='output/plots/confusion_matrix_train.png'
     )
     
     # Plot test confusion matrix
@@ -235,7 +235,7 @@ def plot_train_test_confusion_matrices(model, train_loader, test_loader, device,
         test_preds,
         class_names,
         title='Confusion Matrix - Test Set',
-        save_path='plots/confusion_matrix_test.png'
+        save_path='output/plots/confusion_matrix_test.png'
     )
     
     return train_preds, train_labels, test_preds, test_labels
