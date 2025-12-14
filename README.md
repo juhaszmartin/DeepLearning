@@ -26,22 +26,6 @@ The data preparation process involves several steps to handle the labeled flag p
    - Performs stratified split (70/30) based on segment IDs to preserve segment integrity
    - Ensures same label distribution in train and test sets
 
-### Submission Checklist
-
-- [x] Docker image builds successfully
-- [x] Training script runs without errors
-- [x] Model trains and evaluates on test set
-- [x] Log file (`log/run.log`) is generated with all required information
-- [x] Hyperparameters are logged
-- [x] Data preparation steps are logged
-- [x] Model architecture summary is logged
-- [x] Training metrics (loss/accuracy) are logged for each epoch
-- [x] Validation metrics are logged
-- [x] Final evaluation results (accuracy, confusion matrix, classification report) are logged
-- [x] Plots are saved to `plots/` folder
-- [x] README.md is complete with Docker instructions
-- [x] Code is properly organized in `src/` directory
-
 ## Project Details
 
 ### Project Information
@@ -71,8 +55,9 @@ The data preparation process involves several steps to handle the labeled flag p
 - Training metrics (loss and accuracy) and validation metrics (test set performance) are computed every epoch
 
 **Results**: 
-- Multi-class accuracy: ~50% (6-way classification)
-- Binary accuracy (Bullish vs Bearish): ~70%
+- For baseline I used my older LSTM experiments, with around 30-35% 6-way classification accuracy
+- Multi-class accuracy: ~55% (6-way classification)
+- Binary accuracy (Bullish vs Bearish): ~76%
 - Training time: ~3 minutes on NVIDIA RTX 5070 (Blackwell) for 2000 epochs
 - The model performs better at distinguishing bullish vs bearish patterns than at classifying specific flag sub-types
 
